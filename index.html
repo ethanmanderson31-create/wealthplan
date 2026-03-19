@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ethan's Wealth Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #0e0e0f;
+    --bg2: #161618;
+    --bg3: #1e1e21;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #f0efe8;
+    --muted: #888885;
+    --faint: #444442;
+    --green: #4ade80;
+    --green-bg: rgba(74,222,128,0.08);
+    --green-border: rgba(74,222,128,0.2);
+    --purple: #a78bfa;
+    --purple-bg: rgba(167,139,250,0.08);
+    --purple-border: rgba(167,139,250,0.2);
+    --amber: #fbbf24;
+    --amber-bg: rgba(251,191,36,0.08);
+    --amber-border: rgba(251,191,36,0.2);
+    --coral: #fb7185;
+    --coral-bg: rgba(251,113,133,0.08);
+    --coral-border: rgba(251,113,133,0.2);
+    --blue: #60a5fa;
+    --blue-bg: rgba(96,165,250,0.08);
+    --font-mono: 'DM Mono', monospace;
+    --font-sans: 'DM Sans', sans-serif;
+    --radius: 12px;
+    --radius-sm: 7px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .shell {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  .header {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .header-left .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .header-left h1 {
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    line-height: 1.15;
+  }
+
+  .header-left h1 span { color: var(--green); }
+
+  .header-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--green-bg);
+    color: var(--green);
+    border: 1px solid var(--green-border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    white-space: nowrap;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 700px) {
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .metric {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .metric-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .metric-val {
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-sub { font-size: 11px; color: var(--muted); }
+
+  .controls-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 110px;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .input-row:last-child { border-bottom: none; }
+  .input-info { min-width: 0; }
+  .input-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .input-desc { font-size: 11px; color: var(--muted); }
+  .input-status {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .money-input,
+  .month-extra-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 12px 14px;
+    outline: none;
+  }
+
+  .money-input:focus,
+  .month-extra-input:focus {
+    border-color: var(--green-border);
+    box-shadow: 0 0 0 3px rgba(74,222,128,0.08);
+  }
+
+  .input-output {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .goal-row {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .goal-row:last-child { border-bottom: none; }
+
+  .goal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    gap: 12px;
+  }
+
+  .goal-name { font-size: 13px; font-weight: 500; }
+
+  .goal-nums {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .progress-track {
+    height: 5px;
+    background: var(--bg3);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 5px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .goal-note { font-size: 11px; color: var(--muted); }
+
+  .month-nav {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .month-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .04em;
+  }
+
+  .month-btn:hover { color: var(--text); border-color: var(--faint); }
+
+  .month-btn.active {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+    font-weight: 500;
+  }
+
+  .alloc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+
+  .alloc-row:last-child { border-bottom: none; }
+  .alloc-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .alloc-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .alloc-label { font-size: 13px; color: var(--text); }
+  .alloc-sub { font-size: 11px; color: var(--muted); }
+
+  .alloc-val {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .alloc-val.pos { color: var(--green); }
+  .alloc-val.neg { color: var(--coral); }
+
+  .alloc-highlight {
+    background: var(--bg3);
+    border-radius: var(--radius-sm);
+    margin: 6px -4px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .alloc-highlight .label { font-size: 13px; font-weight: 500; }
+  .alloc-highlight .val { font-family: var(--font-mono); font-size: 14px; font-weight: 500; }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 10px;
+    border: 1px solid;
+  }
+
+  .badge-green { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); border-color: var(--purple-border); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+  .badge-coral { background: var(--coral-bg); color: var(--coral); border-color: var(--coral-border); }
+
+  .chart-wrap { position: relative; height: 280px; margin-top: 8px; }
+
+  .rule-row {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .rule-row:last-child { border-bottom: none; }
+
+  .rule-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--faint);
+    min-width: 18px;
+    margin-top: 2px;
+  }
+
+  .rule-text { font-size: 13px; color: var(--text); }
+  .rule-detail { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  @media (max-width: 680px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  .section { margin-bottom: 32px; }
+
+  .paycheck-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  @media (max-width: 840px) {
+    .paycheck-grid { grid-template-columns: 1fr; }
+  }
+
+  .paycheck-card {
+    background: var(--bg3);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+  }
+
+  .paycheck-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .pc-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    gap: 12px;
+  }
+
+  .pc-row:last-child { border-bottom: none; }
+  .pc-label { color: var(--muted); }
+  .pc-val { font-family: var(--font-mono); font-weight: 500; }
+  .pc-total { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .pc-total .pc-label, .pc-total .pc-val { color: var(--text); }
+
+  .month-input-wrap {
+    display: grid;
+    grid-template-columns: 1fr 140px;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .month-input-note {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .month-lock-note {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 560px) {
+    .input-row,
+    .month-input-wrap {
+      grid-template-columns: 1fr;
+    }
+
+    .input-output { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="header">
+    <div class="header-left">
+      <div class="eyebrow">Ethan · Wealth System</div>
+      <h1>12-Month <span>Money Plan</span></h1>
+    </div>
+    <div class="header-badge">Apr 2026 — Mar 2027</div>
+  </header>
+
+  <div class="section">
+    <div class="section-label">Adjust your income</div>
+    <div class="controls-card">
+      <div class="input-row">
+        <div class="input-info">
+          <div class="input-name">Base salary</div>
+          <div class="input-desc">Type your normal monthly base income for this month forward</div>
+          <div class="input-status">Press Enter to save. Previous months stay locked.</div>
+        </div>
+        <input class="money-input" id="input-base" type="number" min="0" step="50" value="2600">
+        <div class="input-output" id="out-base">$2,600/mo</div>
+      </div>
+      <div class="input-row">
+        <div class="input-info">
+          <div class="input-name">Commission</div>
+          <div class="input-desc">Type your normal monthly commission for this month forward</div>
+          <div class="input-status">Press Enter to save. Previous months stay locked.</div>
+        </div>
+        <input class="money-input" id="input-comm" type="number" min="0" step="50" value="1750">
+        <div class="input-output" id="out-comm">$1,750/mo</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Overview</div>
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Monthly income</div>
+        <div class="metric-val" id="m-income" style="color:var(--green)">$4,350</div>
+        <div class="metric-sub">Base + commission</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Monthly expenses</div>
+        <div class="metric-val" id="m-expenses">$2,461</div>
+        <div class="metric-sub">Fixed + variable + giving</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">12-month total in</div>
+        <div class="metric-val" id="m-total-in">$52,200</div>
+        <div class="metric-sub">Including extra month income</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Wealth built (12mo)</div>
+        <div class="metric-val" id="m-wealth" style="color:var(--green)">$22,651</div>
+        <div class="metric-sub">Emergency + invest + house</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col section">
+    <div class="card">
+      <div class="section-label">Wealth growth — 12 months</div>
+      <div class="chart-wrap">
+        <canvas id="growthChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-label">Monthly allocation breakdown</div>
+      <div class="chart-wrap">
+        <canvas id="allocChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Goal progress at 12 months</div>
+    <div class="card">
+      <div class="goal-row">
+        <div class="goal-header">
+          <div class="goal-name" style="color:var(--coral)">Emergency fund</div>
+          <div class="goal-nums" id="g-emergency">$8,000 — fully funded!</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="p-emergency" style="background:var(--coral);width:100%"></div>
+        </div>
+        <div class="goal-note" id="gn-emergency">Fund this first, then redirect overflow to house</div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-header">
+          <div class="goal-name" style="color:var(--purple)">Roth IRA contributions</div>
+          <div class="goal-nums" id="g-ira">$6,800 of $7,000 annual max</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="p-ira" style="background:var(--purple);width:97%"></div>
+        </div>
+        <div class="goal-note" id="gn-ira">Stays close to the annual max at current pace</div>
+      </div>
+      <div class="goal-row">
+        <div class="goal-header">
+          <div class="goal-name" style="color:var(--green)">House / future fund</div>
+          <div class="goal-nums" id="g-house">$7,851 of $30,000</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="p-house" style="background:var(--green);width:26%"></div>
+        </div>
+        <div class="goal-note" id="gn-house">Overflow and extra monthly income flow here after emergency gets filled</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Month-by-month</div>
+    <div class="month-nav" id="month-nav"></div>
+    <div class="card" id="month-detail"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Paycheck system</div>
+    <div class="card">
+      <div class="paycheck-grid">
+        <div class="paycheck-card">
+          <div class="paycheck-title">Fixed expenses (bills)</div>
+          <div class="pc-row"><span class="pc-label">Rent</span><span class="pc-val">$925</span></div>
+          <div class="pc-row"><span class="pc-label">Hormozi Program</span><span class="pc-val">$250</span></div>
+          <div class="pc-row"><span class="pc-label">Car Insurance</span><span class="pc-val">$130</span></div>
+          <div class="pc-row"><span class="pc-label">Utilities</span><span class="pc-val">$65</span></div>
+          <div class="pc-row"><span class="pc-label">Phone</span><span class="pc-val">$30</span></div>
+          <div class="pc-row"><span class="pc-label">Life Insurance</span><span class="pc-val">$20</span></div>
+          <div class="pc-row"><span class="pc-label">Gym</span><span class="pc-val">$11</span></div>
+          <div class="pc-row pc-total"><span class="pc-label">Total fixed</span><span class="pc-val">$1,431</span></div>
+        </div>
+        <div class="paycheck-card">
+          <div class="paycheck-title">Variable expenses (living)</div>
+          <div class="pc-row"><span class="pc-label">Groceries</span><span class="pc-val">$300</span></div>
+          <div class="pc-row"><span class="pc-label">Gas</span><span class="pc-val">$100</span></div>
+          <div class="pc-row"><span class="pc-label">Date Nights / Fun</span><span class="pc-val">$100</span></div>
+          <div class="pc-row"><span class="pc-label">Car Maintenance</span><span class="pc-val">$70</span></div>
+          <div class="pc-row"><span class="pc-label">Health Buffer</span><span class="pc-val">$25</span></div>
+          <div class="pc-row pc-total"><span class="pc-label">Total variable</span><span class="pc-val">$595</span></div>
+        </div>
+        <div class="paycheck-card">
+          <div class="paycheck-title">Monthly flow</div>
+          <div class="pc-row"><span class="pc-label">Base income</span><span class="pc-val" id="pc-base-monthly">$2,600</span></div>
+          <div class="pc-row"><span class="pc-label">Commission</span><span class="pc-val" id="pc-comm-monthly">$1,750</span></div>
+          <div class="pc-row"><span class="pc-label">Tithing (10%)</span><span class="pc-val" style="color:var(--amber)" id="pc-tithe-monthly">$435</span></div>
+          <div class="pc-row"><span class="pc-label">Bills + living</span><span class="pc-val" style="color:var(--coral)" id="pc-bills-monthly">$2,026</span></div>
+          <div class="pc-row"><span class="pc-label">Emergency (50%)</span><span class="pc-val" style="color:var(--coral)" id="pc-emg">$945</span></div>
+          <div class="pc-row"><span class="pc-label">Invest (30%)</span><span class="pc-val" style="color:var(--purple)" id="pc-inv">$567</span></div>
+          <div class="pc-row"><span class="pc-label">House fund (20%)</span><span class="pc-val" style="color:var(--green)" id="pc-house">$378</span></div>
+          <div class="pc-row pc-total"><span class="pc-label">Available to build</span><span class="pc-val" id="pc-build-total">$1,889</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The 4 rules</div>
+    <div class="card">
+      <div class="rule-row">
+        <div class="rule-num">01</div>
+        <div>
+          <div class="rule-text">Tithing gets paid first</div>
+          <div class="rule-detail">10% of total monthly income is always carved out before anything else moves</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-num">02</div>
+        <div>
+          <div class="rule-text">Bills are fully visible</div>
+          <div class="rule-detail">Fixed and variable living costs are broken out so you can see exactly where the monthly number comes from</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-num">03</div>
+        <div>
+          <div class="rule-text">Extra income is month-specific</div>
+          <div class="rule-detail">Any bonus, refund, or side income can be added to the exact month it actually lands</div>
+        </div>
+      </div>
+      <div class="rule-row">
+        <div class="rule-num">04</div>
+        <div>
+          <div class="rule-text">What is left gets assigned with purpose</div>
+          <div class="rule-detail">After giving and living costs are covered, the remaining money flows 50% emergency, 30% invest, 20% house</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'ethan-wealth-plan-v2';
+const FIXED_EXPENSES = {
+  rent: 925,
+  hormozi: 250,
+  carInsurance: 130,
+  utilities: 65,
+  phone: 30,
+  lifeInsurance: 20,
+  gym: 11,
+};
+
+const VARIABLE_EXPENSES = {
+  groceries: 300,
+  gas: 100,
+  fun: 100,
+  maintenance: 70,
+  health: 25,
+};
+
+const TOTAL_FIXED = Object.values(FIXED_EXPENSES).reduce((sum, value) => sum + value, 0);
+const TOTAL_VARIABLE = Object.values(VARIABLE_EXPENSES).reduce((sum, value) => sum + value, 0);
+const BASE_EXPENSES = TOTAL_FIXED + TOTAL_VARIABLE;
+const TITHING_RATE = 0.10;
+const EMERG_GOAL = 8000;
+const HOUSE_GOAL = 30000;
+const IRA_ANNUAL_MAX = 7000;
+const PLAN_START_YEAR = 2026;
+const PLAN_START_MONTH_INDEX = 3;
+const MONTHS = ['April','May','June','July','August','September','October','November','December','January','February','March'];
+
+const DEFAULT_BASE = 2600;
+const DEFAULT_COMM = 1750;
+
+let monthPlans = [];
+let activeMonthIndex = 0;
+let selectedMonthIndex = 0;
+let growthChart;
+let allocChart;
+
+const fmt = value => '$' + Math.round(value).toLocaleString();
+const pct = (value, total) => total <= 0 ? 0 : Math.min(100, Math.round((value / total) * 100));
+
+function getCurrentPlanMonthIndex() {
+  const now = new Date();
+  const start = new Date(PLAN_START_YEAR, PLAN_START_MONTH_INDEX, 1);
+  const diff = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+  return Math.max(0, Math.min(MONTHS.length - 1, diff));
+}
+
+function createDefaultMonthPlans() {
+  return MONTHS.map(name => ({
+    name,
+    base: DEFAULT_BASE,
+    comm: DEFAULT_COMM,
+    extra: 0,
+  }));
+}
+
+function normalizeMonthPlan(raw, index) {
+  const fallback = createDefaultMonthPlans()[index];
+  return {
+    name: MONTHS[index],
+    base: Math.max(0, Number(raw?.base ?? fallback.base) || 0),
+    comm: Math.max(0, Number(raw?.comm ?? fallback.comm) || 0),
+    extra: Math.max(0, Number(raw?.extra ?? fallback.extra) || 0),
+  };
+}
+
+function loadState() {
+  activeMonthIndex = getCurrentPlanMonthIndex();
+  selectedMonthIndex = activeMonthIndex;
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    const savedMonths = Array.isArray(saved.monthPlans) ? saved.monthPlans : [];
+    monthPlans = MONTHS.map((_, index) => normalizeMonthPlan(savedMonths[index], index));
+  } catch (error) {
+    monthPlans = createDefaultMonthPlans();
+  }
+
+  if (!monthPlans.length) {
+    monthPlans = createDefaultMonthPlans();
+  }
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ monthPlans }));
+}
+
+function getEditingDefaults() {
+  return monthPlans[activeMonthIndex] || createDefaultMonthPlans()[activeMonthIndex];
+}
+
+function applyIncomeChange(field, value) {
+  const nextValue = Math.max(0, Number(value) || 0);
+  for (let index = activeMonthIndex; index < monthPlans.length; index += 1) {
+    monthPlans[index][field] = nextValue;
+  }
+  saveState();
+}
+
+function calcMonthly(monthPlan) {
+  const income = monthPlan.base + monthPlan.comm + monthPlan.extra;
+  const tithe = income * TITHING_RATE;
+  const buildable = Math.max(0, income - tithe - BASE_EXPENSES);
+  const emg = buildable * 0.50;
+  const inv = buildable * 0.30;
+  const house = buildable * 0.20;
+
+  return {
+    income,
+    tithe,
+    fixed: TOTAL_FIXED,
+    variable: TOTAL_VARIABLE,
+    baseExpenses: BASE_EXPENSES,
+    buildable,
+    base: monthPlan.base,
+    comm: monthPlan.comm,
+    emg,
+    inv,
+    house,
+    extra: monthPlan.extra,
+  };
+}
+
+function buildMonthData() {
+  const months = [];
+  let cumEmg = 0;
+  let cumInv = 0;
+  let cumHouse = 0;
+
+  for (let i = 0; i < MONTHS.length; i += 1) {
+    const monthCalc = calcMonthly(monthPlans[i]);
+    let monthEmg = monthCalc.emg;
+    let monthHouse = monthCalc.house;
+
+    if (cumEmg < EMERG_GOAL) {
+      const remaining = EMERG_GOAL - cumEmg;
+      if (monthEmg > remaining) {
+        const overflow = monthEmg - remaining;
+        monthEmg = remaining;
+        monthHouse += overflow;
+      }
+    } else {
+      monthHouse += monthEmg;
+      monthEmg = 0;
+    }
+
+    cumEmg = Math.min(EMERG_GOAL, cumEmg + monthEmg);
+    cumInv += monthCalc.inv;
+    cumHouse += monthHouse;
+
+    months.push({
+      name: MONTHS[i],
+      ...monthCalc,
+      emg: monthEmg,
+      house: monthHouse,
+      cumEmg,
+      cumInv,
+      cumHouse,
+      cumTotal: cumEmg + cumInv + cumHouse,
+    });
+  }
+
+  return months;
+}
+
+function renderMetrics(months) {
+  const typical = calcMonthly(getEditingDefaults());
+  const last = months[months.length - 1];
+
+  document.getElementById('m-income').textContent = fmt(typical.base + typical.comm);
+  document.getElementById('m-expenses').textContent = fmt(typical.baseExpenses + typical.tithe);
+  document.getElementById('m-total-in').textContent = fmt(months.reduce((sum, month) => sum + month.income, 0));
+  document.getElementById('m-wealth').textContent = fmt(last.cumTotal);
+}
+
+function renderGoals(months) {
+  const last = months[months.length - 1];
+
+  document.getElementById('g-emergency').textContent = last.cumEmg >= EMERG_GOAL
+    ? `${fmt(last.cumEmg)} — fully funded!`
+    : `${fmt(last.cumEmg)} of ${fmt(EMERG_GOAL)}`;
+  document.getElementById('p-emergency').style.width = pct(last.cumEmg, EMERG_GOAL) + '%';
+
+  const emgFundedMonth = months.findIndex(month => month.cumEmg >= EMERG_GOAL);
+  document.getElementById('gn-emergency').textContent = emgFundedMonth >= 0
+    ? `Fully funded in ${MONTHS[emgFundedMonth]} — later emergency money rolls into house`
+    : `Need ${fmt(EMERG_GOAL - last.cumEmg)} more to finish the emergency fund`;
+
+  const iraPct = pct(last.cumInv, IRA_ANNUAL_MAX);
+  document.getElementById('g-ira').textContent = `${fmt(last.cumInv)} of ${fmt(IRA_ANNUAL_MAX)} annual max`;
+  document.getElementById('p-ira').style.width = iraPct + '%';
+  document.getElementById('gn-ira').textContent = last.cumInv >= IRA_ANNUAL_MAX
+    ? `You reach the annual Roth IRA max inside this 12-month plan`
+    : `${fmt(last.cumInv)} contributed over 12 months at the current pace`;
+
+  const housePct = pct(last.cumHouse, HOUSE_GOAL);
+  document.getElementById('g-house').textContent = `${fmt(last.cumHouse)} of ${fmt(HOUSE_GOAL)}`;
+  document.getElementById('p-house').style.width = housePct + '%';
+  document.getElementById('gn-house').textContent = last.cumHouse > 0
+    ? `At this pace, about ${Math.ceil(HOUSE_GOAL / last.cumHouse)} more years to reach ${fmt(HOUSE_GOAL)}`
+    : `No house-fund progress yet at the current cash flow`;
+}
+
+function renderMonth(months, index) {
+  const month = months[index];
+  const isPastMonth = index < activeMonthIndex;
+  const monthLockMessage = isPastMonth ? 'Locked historical month' : 'Editable month';
+
+  document.getElementById('month-detail').innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div style="font-size:16px;font-weight:500">${month.name}</div>
+      <div class="month-lock-note">${monthLockMessage} · month ${index + 1} of 12</div>
+    </div>
+
+    <div class="month-input-wrap">
+      <div>
+        <div class="alloc-label">Additional income for ${month.name}</div>
+        <div class="month-input-note">Type the full number, then press Enter to save it for this month.</div>
+      </div>
+      <input class="month-extra-input" id="month-extra-input" type="number" min="0" step="50" value="${Math.round(month.extra)}" ${isPastMonth ? 'disabled' : ''}>
+    </div>
+
+    <div class="alloc-highlight" style="margin-bottom:8px">
+      <span class="label">Total income</span>
+      <span class="val" style="color:var(--green)">${fmt(month.income)}</span>
+    </div>
+
+    <div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:var(--blue)"></div><div><div class="alloc-label">Additional income</div><div class="alloc-sub">Only this month</div></div></div>
+      <div class="alloc-val pos">${fmt(month.extra)}</div>
+    </div>
+    <div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:var(--amber)"></div><div><div class="alloc-label">Tithing</div><div class="alloc-sub">10% of total income</div></div></div>
+      <div class="alloc-val neg">-${fmt(month.tithe)}</div>
+    </div>
+    <div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:var(--coral)"></div><div><div class="alloc-label">Fixed expenses</div><div class="alloc-sub">${fmt(TOTAL_FIXED)} total bills</div></div></div>
+      <div class="alloc-val neg">-${fmt(month.fixed)}</div>
+    </div>
+    <div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:#6b7280"></div><div><div class="alloc-label">Variable expenses</div><div class="alloc-sub">${fmt(TOTAL_VARIABLE)} monthly living</div></div></div>
+      <div class="alloc-val neg">-${fmt(month.variable)}</div>
+    </div>
+
+    <div style="height:1px;background:var(--border);margin:8px 0"></div>
+
+    <div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:var(--coral)"></div><div><div class="alloc-label">→ Emergency fund</div><div class="alloc-sub">Running total: ${fmt(month.cumEmg)} of ${fmt(EMERG_GOAL)}</div></div></div>
+      <div class="alloc-val pos">+${fmt(month.emg)}</div>
+    </div>
+    <div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:var(--purple)"></div><div><div class="alloc-label">→ Roth IRA</div><div class="alloc-sub">Running total: ${fmt(month.cumInv)}</div></div></div>
+      <div class="alloc-val" style="color:var(--purple)">+${fmt(month.inv)}</div>
+    </div>
+    <div class="alloc-row">
+      <div class="alloc-left"><div class="alloc-dot" style="background:var(--green)"></div><div><div class="alloc-label">→ House fund</div><div class="alloc-sub">Running total: ${fmt(month.cumHouse)}</div></div></div>
+      <div class="alloc-val pos">+${fmt(month.house)}</div>
+    </div>
+
+    <div class="alloc-highlight" style="margin-top:8px">
+      <span class="label">Total wealth built (cumulative)</span>
+      <span class="val" style="color:var(--green)">${fmt(month.cumTotal)}</span>
+    </div>
+  `;
+
+  const monthInput = document.getElementById('month-extra-input');
+  if (!isPastMonth) {
+    const commitMonthExtra = () => {
+      monthPlans[index].extra = Math.max(0, Number(monthInput.value) || 0);
+      saveState();
+      render();
+    };
+
+    monthInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        commitMonthExtra();
+        monthInput.blur();
+      }
+    });
+
+    monthInput.addEventListener('blur', commitMonthExtra);
+  }
+}
+
+function renderMonthNav(months) {
+  const nav = document.getElementById('month-nav');
+  nav.innerHTML = months.map((month, index) => `
+    <button class="month-btn ${index === selectedMonthIndex ? 'active' : ''}" onclick="selectMonth(${index})">${month.name}</button>
+  `).join('');
+}
+
+function selectMonth(index) {
+  selectedMonthIndex = index;
+  render();
+}
+
+function renderCharts(months) {
+  const labels = months.map(month => month.name.slice(0, 3));
+  const emgData = months.map(month => Math.round(month.cumEmg));
+  const invData = months.map(month => Math.round(month.cumInv));
+  const houseData = months.map(month => Math.round(month.cumHouse));
+  const totalData = months.map(month => Math.round(month.cumTotal));
+
+  if (growthChart) growthChart.destroy();
+  growthChart = new Chart(document.getElementById('growthChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Total wealth', data: totalData, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.06)', fill: true, tension: 0.4, pointRadius: 3, borderWidth: 2 },
+        { label: 'Emergency', data: emgData, borderColor: '#fb7185', fill: false, tension: 0.4, pointRadius: 2, borderWidth: 1.5 },
+        { label: 'Investments', data: invData, borderColor: '#a78bfa', fill: false, tension: 0.4, pointRadius: 2, borderWidth: 1.5 },
+        { label: 'House', data: houseData, borderColor: '#34d399', fill: false, tension: 0.4, pointRadius: 2, borderWidth: 1.5 },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: context => ` ${context.dataset.label}: $${context.parsed.y.toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#888885', font: { family: 'DM Mono', size: 10 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#888885', font: { family: 'DM Mono', size: 10 }, callback: value => '$' + (value / 1000).toFixed(0) + 'k' } }
+      }
+    }
+  });
+
+  const typical = calcMonthly(getEditingDefaults());
+
+  if (allocChart) allocChart.destroy();
+  allocChart = new Chart(document.getElementById('allocChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Emergency', 'Investments', 'House fund', 'Fixed bills', 'Variable living', 'Tithing'],
+      datasets: [{
+        data: [
+          Math.round(typical.emg),
+          Math.round(typical.inv),
+          Math.round(typical.house),
+          TOTAL_FIXED,
+          TOTAL_VARIABLE,
+          Math.round(typical.tithe)
+        ],
+        backgroundColor: ['#fb7185', '#a78bfa', '#4ade80', '#374151', '#6b7280', '#fbbf24'],
+        borderWidth: 0,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: context => ` ${context.label}: $${context.parsed.toLocaleString()}`
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderPaycheck() {
+  const typical = calcMonthly(getEditingDefaults());
+
+  document.getElementById('pc-base-monthly').textContent = fmt(typical.base);
+  document.getElementById('pc-comm-monthly').textContent = fmt(typical.comm);
+  document.getElementById('pc-tithe-monthly').textContent = fmt(typical.tithe);
+  document.getElementById('pc-bills-monthly').textContent = fmt(BASE_EXPENSES);
+  document.getElementById('pc-emg').textContent = fmt(typical.emg);
+  document.getElementById('pc-inv').textContent = fmt(typical.inv);
+  document.getElementById('pc-house').textContent = fmt(typical.house);
+  document.getElementById('pc-build-total').textContent = fmt(typical.buildable);
+}
+
+function renderOutputs() {
+  const currentDefaults = getEditingDefaults();
+  document.getElementById('input-base').value = Math.round(currentDefaults.base);
+  document.getElementById('input-comm').value = Math.round(currentDefaults.comm);
+  document.getElementById('out-base').textContent = `${fmt(currentDefaults.base)}/mo`;
+  document.getElementById('out-comm').textContent = `${fmt(currentDefaults.comm)}/mo`;
+}
+
+function render() {
+  const months = buildMonthData();
+  renderOutputs();
+  renderMetrics(months);
+  renderGoals(months);
+  renderMonthNav(months);
+  renderMonth(months, selectedMonthIndex);
+  renderCharts(months);
+  renderPaycheck();
+}
+
+function setupInputs() {
+  const baseInput = document.getElementById('input-base');
+  const commInput = document.getElementById('input-comm');
+
+  const commitBase = () => {
+    applyIncomeChange('base', baseInput.value);
+    render();
+  };
+
+  const commitComm = () => {
+    applyIncomeChange('comm', commInput.value);
+    render();
+  };
+
+  baseInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      commitBase();
+      baseInput.blur();
+    }
+  });
+
+  commInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      commitComm();
+      commInput.blur();
+    }
+  });
+
+  baseInput.addEventListener('blur', commitBase);
+  commInput.addEventListener('blur', commitComm);
+}
+
+loadState();
+setupInputs();
+render();
+</script>
+</body>
+</html>
