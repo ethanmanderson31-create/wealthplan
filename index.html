@@ -94,6 +94,60 @@
     white-space: nowrap;
   }
 
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .data-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+
+  .data-btn:hover {
+    color: var(--text);
+    border-color: var(--faint);
+  }
+
+  .data-btn.import-btn:hover {
+    color: var(--blue);
+    border-color: var(--blue);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity .25s, transform .25s;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   .section-label {
     font-family: var(--font-mono);
     font-size: 10px;
@@ -435,8 +489,13 @@
       <div class="eyebrow">Ethan · Wealth System</div>
       <h1>12-Month <span>Money Plan</span></h1>
     </div>
-    <div class="header-badge">Apr 2026 — Mar 2027</div>
+    <div class="header-right">
+      <button class="data-btn" onclick="exportData()">↓ Export data</button>
+      <label class="data-btn import-btn" style="cursor:pointer">↑ Import data<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+      <div class="header-badge">Apr 2026 — Mar 2027</div>
+    </div>
   </header>
+  <div class="toast" id="toast"></div>
 
   <div class="section">
     <div class="section-label">Adjust your income</div>
@@ -1054,6 +1113,51 @@ function setupInputs() {
 
   baseInput.addEventListener('blur', commitBase);
   commInput.addEventListener('blur', commitComm);
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function exportData() {
+  const payload = {
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    monthPlans,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ethan-wealth-plan.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Data exported ✓');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const savedMonths = Array.isArray(parsed.monthPlans) ? parsed.monthPlans : [];
+      if (!savedMonths.length) throw new Error('No month data found');
+      monthPlans = MONTHS.map((_, index) => normalizeMonthPlan(savedMonths[index], index));
+      saveState();
+      render();
+      showToast('Data imported ✓');
+    } catch (err) {
+      showToast('Import failed — invalid file');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
 }
 
 loadState();
